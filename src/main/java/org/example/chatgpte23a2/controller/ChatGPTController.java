@@ -1,10 +1,8 @@
 package org.example.chatgpte23a2.controller;
 
-import org.example.chatgpte23a2.dto.ChatRequest;
-import org.example.chatgpte23a2.dto.Choice;
-import org.example.chatgpte23a2.dto.Message;
-import org.example.chatgpte23a2.dto.Usage;
+import org.example.chatgpte23a2.dto.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +39,13 @@ public class ChatGPTController {
         chatRequest.setStream(false); //stream = true, er for viderekomne, der kommer flere svar asynkront
         chatRequest.setPresencePenalty(1); //noget med ikke at gentage sig. se powerpoint
 
+        ChatResponse response = webClient.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(h -> h.setBearerAuth(openapikey))
+                .bodyValue(chatRequest)
+                .retrieve()
+                .bodyToMono(ChatResponse.class)
+                .block();
 
         List<Choice> lst = response.getChoices();
         Usage usg = response.getUsage();
